@@ -47,7 +47,7 @@ jobs:
                     pkg=$(basename "$dir")
                     echo "🔍 Rodando testes em $pkg"
                     (cd "$dir" && flutter pub get)
-                    flutter test --coverage --machine > "$GITHUB_WORKSPACE/test-results/${pkg}.json"
+                    flutter test --machine > "$GITHUB_WORKSPACE/test-results/${pkg}.json"
                 fi
                 done
 
