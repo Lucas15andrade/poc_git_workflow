@@ -1,5 +1,10 @@
 name: CI/CD - POC
 
+permissions:
+    checks: write
+    contents: read
+    pull-requests: write
+
 on:
     push:
         branches:
