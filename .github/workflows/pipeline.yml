@@ -1,0 +1,56 @@
+name: CI/CD - POC
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    lint:
+        name: Run Flutter analyze
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-java@v1
+              with:
+                java-version: "12.x"
+            - uses: subosito/flutter-action@v2
+              with:
+                channel: "stable"
+            - run: flutter pub get
+            - run: flutter analyze
+    test-unit:
+        name: Run Flutter unit test
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-java@v1
+              with:
+                java-version: "12.x"
+            - uses: subosito/flutter-action@v2
+              with:
+                channel: "stable"
+            - name: Run tests for all packages
+              run: |
+                    for dir in packages/*; do
+                        if [ -d "$dir" ]; then
+                            echo "🔍 Rodando testes em $dir"
+                            cd "$dir"
+                            flutter pub get
+                            flutter test --coverage --machine > "../../test-results/$(basename $dir).json"
+                            cd ../..
+                        fi
+                    done
+
+            - name: Test reporter
+              uses: dorny/test-reporter@v2
+              if: ${{ !cancelled() }} 
+              with:
+                name: Flutter Tests
+                path: test-results/*.json
+                reporter: flutter-json
+
+
